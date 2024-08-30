@@ -11,38 +11,7 @@ import atexit
 documents_folder_path = "sources"
 vector_db_path = "vector_db"
 
-def main():
-    st.set_page_config(
-        page_title="AI-Powered Document Intelligence",
-        page_icon=":bulb:"  # Lightbulb icon
-    )
-
-    st.title("AI Assistant for State-of-the-Art Document Writing :books:")
-    st.markdown("Unlock the knowledge within your documents. Ask questions, get insights, and craft documents with AI assistance.")
-
-    user_question = st.text_input("Enter your query or request:")
-
-    with st.sidebar:
-        st.subheader("Your Knowledge Base")
-        uploaded_files = st.file_uploader(
-            "Upload  research papers or any relevant documents.", 
-            accept_multiple_files=True, type=['pdf','doc','txt'] 
-        )
-
-        if st.button("Analyze"):
-            if uploaded_files:
-                save_uploaded_files(uploaded_files)
-                with st.spinner("Documents uploaded and analysis in progress..."):
-                    create_index(documents_folder_path, vector_db_path)
-                st.success("Analysis done")
-
-
-    chat_container = st.empty()  # Create a dynamic area for chat history
-    if user_question:
-        response = answer_query(user_question,vector_db_path)
-        chat_container.markdown(f"**You:** {user_question}")  # Display user's query
-        chat_container.markdown(f"**AI Assistant:** {response}")  # Display the answer from the AI
-
+# Function to clean up folders
 def cleanup_folders():
     folders = ['vector_db', 'sources']
     for folder in folders:
@@ -59,7 +28,7 @@ def cleanup_folders():
         except Exception as e:
             print(f"Failed to create folder {folder}. Reason: {e}")
 
-
+# Function to save uploaded files
 def save_uploaded_files(uploaded_files):
     # Define the path to the folder where files will be saved
     save_path = 'sources'
@@ -73,6 +42,44 @@ def save_uploaded_files(uploaded_files):
         with open(os.path.join(save_path, uploaded_file.name), "wb") as f:
             f.write(uploaded_file.getbuffer())
 
+# Main function for the app
+def main():
+
+    # Ensure cleanup happens once when the app starts
+    if 'initialized' not in st.session_state:
+        cleanup_folders()
+        st.session_state['initialized'] = True
+
+    st.set_page_config(
+        page_title="AI-Powered Document Intelligence",
+        page_icon=":bulb:"  # Lightbulb icon
+    )
+
+    st.title("AI Assistant for State-of-the-Art Document Writing :books:")
+    st.markdown("Unlock the knowledge within your documents. Ask questions, get insights, and craft documents with AI assistance.")
+
+    user_question = st.text_input("Enter your query or request:")
+
+    with st.sidebar:
+        st.subheader("Your Knowledge Base")
+        uploaded_files = st.file_uploader(
+            "Upload research papers or any relevant documents.", 
+            accept_multiple_files=True, type=['pdf','doc','txt'] 
+        )
+
+        if st.button("Analyze"):
+            if uploaded_files:
+                save_uploaded_files(uploaded_files)
+                with st.spinner("Documents uploaded and analysis in progress..."):
+                    create_index(documents_folder_path, vector_db_path)
+                st.success("Analysis done")
+
+    chat_container = st.empty()  # Create a dynamic area for chat history
+    if user_question:
+        response = answer_query(user_question, vector_db_path)
+        chat_container.markdown(f"**You:** {user_question}")  # Display user's query
+        chat_container.markdown(f"**AI Assistant:** {response}")  # Display the answer from the AI
+
+# Entry point for the app
 if __name__ == '__main__':
-    
     main()
