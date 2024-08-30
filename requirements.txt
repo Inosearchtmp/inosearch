@@ -1,0 +1,11 @@
+chroma
+streamlit
+llama_index.llms.huggingface  
+llama_index.vector_stores.chroma
+llama_index.llms.anthropic
+llama_index.embeddings.huggingface  
+llama-index
+anthropic 
+huggingface-hub 
+streamlit     
+protobuf==3.20.3
